@@ -1,0 +1,88 @@
+#!/usr/bin/env python3
+
+import subprocess
+import time
+from multiprocessing import Pipe , Process
+
+def robot(conn):
+	time.sleep(2)
+	subprocess.call(['xterm', '-e', 'python2.7 ./robot_simulator/robot.py'])
+def robot_server(conn):
+	time.sleep(5)
+	subprocess.call(['xterm', '-e', 'python2.7 ./localization.1.0/robot_server1.1.py'])
+
+def robot_view(conn):
+	time.sleep(2)
+	subprocess.call(['xterm', '-e', 'firefox file:localization_view/index.html'])
+
+def comuincation(conn):
+	subprocess.call(['xterm', '-e', 'source ./server.pyro'])
+
+def control(conn):
+	time.sleep(5)
+	subprocess.call(['xterm', '-e', 'python2.7 ./robot_control/control_server.py'])
+
+def planner(conn):
+	time.sleep(5)
+	subprocess.call(['xterm', '-e', 'python2.7 ./path_planner.1.0/planner.py'])
+
+def planner_view(conn):
+	time.sleep(6)
+	subprocess.call(['xterm', '-e', 'firefox file:path_planner_view/index.html'])
+
+if __name__== '__main__':
+
+	parent_conn1, child_conn1 = Pipe()
+	parent_conn2, child_conn2 = Pipe()
+	parent_conn3, child_conn3 = Pipe()
+	parent_conn4, child_conn4 = Pipe()
+	parent_conn5, child_conn5 = Pipe()
+	parent_conn6, child_conn6 = Pipe()
+	parent_conn7, child_conn7 = Pipe()
+
+
+	p1 = Process(target=comuincation, args=(child_conn1,))
+	p2 = Process(target=robot, args=(child_conn2,))
+	p3 = Process(target=robot_server, args=(child_conn3,))
+	p4 = Process(target=robot_view, args=(child_conn4,))
+	p5 = Process(target=control, args=(child_conn5,))
+	p6 = Process(target=planner, args=(child_conn6,))
+	p7 = Process(target=planner_view, args=(child_conn7,))
+
+
+
+	print ("Crab Operating system")
+	print ("[1] localization and mapping  [2] navigation [3] both")
+	option = input('enter the option : ')
+	opt = int(option);
+
+	p1.start()
+
+	if(opt == 1):
+		p2.start() #robot
+		p5.start() #control
+		p3.start() #robot_server
+		p4.start() #robot_view
+
+	elif(opt == 2):
+		p5.start()#control
+		p6.start()#path_planner
+		p7.start()#planner _view
+	elif(opt == 3 ):
+		p2.start()#robot
+		p5.start()#control
+		p3.start() #robot_server
+		p4.start() #robot_view
+		p6.start()#path_planner
+		p7.start()#planner _view
+
+	else:
+		print("please enter correct option")
+
+	p1.join()
+	p2.join()
+	p3.join()
+	p4.join()
+	p5.join()
+	p6.join()
+	p7.join()

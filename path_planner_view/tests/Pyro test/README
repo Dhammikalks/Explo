@@ -1,0 +1,3 @@
+
+  create /var/www/.local and /var/www/.cache folders, giving www-data permissons to these folders only (and not /var/www to avoid security issues)
+  invoke sudo -H -u www-data pip3 install pyro4 You may still need to add --user to the pip command if it's an older version, because I think that only recent pip versions install to the user's lib folder by default instead of to the global system python's lib folder.
