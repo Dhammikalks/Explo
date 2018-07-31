@@ -18,11 +18,19 @@ Robot, is containing 5 separate component working together.
 
 is a work as API, from the data coming from the robot,lidar and encoders, localize the robot position related to it surrounding? while mapping the surrounding? respected to the robot position . For localization API uses Kalmarn filter inside a particle filter Implementation? for localize and API treat the obstacle it pacing as Landmark of the map and position the landmark on the map according to there probability cures. Also API puses all the result and performance data to the Data base end of the each calculation cycle.
 
- Data base implementation is not finish since i am not yet done with control server but up to now it keeping all the localization data, performance data and keep cursor on latest unused data for the control sever and to keep the rest of the system up to date with localization cycle. 
+ Data base,
+ 
+ implementation is not finish since i am not yet done with control server but up to now it keeping all the localization data, performance data and keep cursor on latest unused data for the control sever and to keep the rest of the system up to date with localization cycle. 
 
 
-Viewer is a API for demonstrated the localization, path planing with generated map manual control panel for debug. It is paging with Data base for Live Data and also old Data as per needed 
+Viewer,
 
-Path Planer is combination of A* Algorithm and Greedy Algorithm to make the system reliable and efficient . it is rendering live map from the Data base then Algorithm work graphical manner and generate set of coordinate for robot to travel and then converted back to real world coordinate and puses back to the Data base 
+is a API for demonstrated the localization, path planing with generated map manual control panel for debug. It is paging with Data base for Live Data and also old Data as per needed 
 
-Control server puses in the path Data from the Data base and according to the current position. it generate immediate action and puses it in to the Data link  
+Path Planer,
+
+is combination of A* Algorithm and Greedy Algorithm to make the system reliable and efficient . it is rendering live map from the Data base then Algorithm work graphical manner and generate set of coordinate for robot to travel and then converted back to real world coordinate and puses back to the Data base 
+
+Control server,
+
+puses in the path Data from the Data base and according to the current position. it generate immediate action and puses it in to the Data link  
