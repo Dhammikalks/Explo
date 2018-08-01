@@ -122,7 +122,13 @@ def astar(start, goal, obstacles,vector):
     return (path, vector)
 #..............................................................................
 def connect():
-    con = MySQLdb.connect(host='localhost', user='root', passwd='DUKS1992', db='ROBOT')
+    sql_data = {}
+    sql_data_file = "./../data.sql"
+    sql = open(sql_data_file,"r")
+    for l in sql:
+        data = l.spilt(":")
+        sql_data[data[0]] = data[1].strip()
+    con = MySQLdb.connect(host=sql_data['host'], user=sql_data['user'], passwd=sql_data['passwd'], db=sql_data['db'])
     try:
 
         cur = con.cursor()

@@ -367,7 +367,7 @@ class FastSLAM:
 
 def connect():
     sql_data = {}
-    sql_data_file ="./sql.data"
+    sql_data_file ="./../sql.data"
     sql = open(sql_data_file,"r")
     for l in sql:
         data = l.split(":")
