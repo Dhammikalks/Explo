@@ -367,12 +367,12 @@ class FastSLAM:
 
 def connect():
     sql_data = {}
-    sql_data_file ="./../sql.data"
+    sql_data_file ="./sql.data"
     sql = open(sql_data_file,"r")
     for l in sql:
         data = l.split(":")
         sql_data[data[0]]= data[1].strip()
-    con = MySQLdb.connect(host=sql_data['host'], user=sql_data['user'], passwd=sql_data['passwd'], db=sql_data['db'])
+    con = MySQLdb.connect(host=sql_data["host"], user=sql_data["user"], passwd=sql_data["passwd"], db=sql_data["db"])
     try:
 
         cur = con.cursor()
