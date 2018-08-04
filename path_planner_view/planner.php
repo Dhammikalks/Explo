@@ -1,5 +1,5 @@
 <?php
-
+header("Access-Control-Allow-Origin: *");
 if(isset($_POST['new']))
 {
    $n = $_POST['new'];

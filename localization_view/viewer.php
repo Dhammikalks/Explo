@@ -1,6 +1,7 @@
 <?php
 //seting header to json
 //header('Content-Type: aplication/json');
+header("Access-Control-Allow-Origin: *");
 if(isset($_POST['new']))
 {
     $n = $_POST['new'];

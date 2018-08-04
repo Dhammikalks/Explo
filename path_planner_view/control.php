@@ -1,4 +1,5 @@
 <?php //logtime.php
+header("Access-Control-Allow-Origin: *");
 
 if(isset($_POST['X_post']))
 {
@@ -12,4 +13,3 @@ if(isset($_POST['X_post']))
 echo $result;
 }
 ?>
-
