@@ -413,9 +413,9 @@ if __name__ == '__main__':
     robot_data = {}
     robot_data_file ="./robot.variable"
     sql = open(robot_data_file,"r")
-        for l in sql:
-            data = l.split(":")
-            robot_data[data[0]]= data[1].strip()
+    for l in sql:
+        data = l.split(":")
+        robot_data[data[0]]= data[1].strip()
 
     scanner_displacement =float(robot_data['scanner_displacement'])
     ticks_to_mm = float(robot_data['ticks_to_mm'])
@@ -444,7 +444,7 @@ if __name__ == '__main__':
     #############..............................
     # Generate initial particles. Each particle is (x, y, theta).
     number_of_particles = int (robot_data['number_of_particles'])
-    start_state = np.array(float(robot_data['start_x']), float(robot_data['start_y']), float(robot_data['start_angle']) / 180.0 * pi])
+    start_state = np.array([float(robot_data['start_x']), float(robot_data['start_y']), float(robot_data['start_angle']) / 180.0 * pi])
     initial_particles = [copy.copy(Particle(start_state))
                          for _ in xrange(number_of_particles)]
 
