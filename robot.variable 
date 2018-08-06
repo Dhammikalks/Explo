@@ -1,0 +1,15 @@
+scanner_displacement:30.0
+ticks_to_mm:0.349
+robot_width:155.0
+minimum_valid_distance:20.0
+depth_jump:100.0
+cylinder_offset:90.0
+control_motion_factor:0.35
+control_turn_factor:0.6
+measurement_distance_stddev:200.0
+measurement_angle_stddev:15.0
+minimum_correspondence_likelihood:0.001
+number_of_particles:25
+start_x:500.0
+start_y:0.0
+start_angle:45.0

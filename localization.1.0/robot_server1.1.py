@@ -410,21 +410,28 @@ def insert_Data_to_DataBase(conn):
 #......................................................................
 if __name__ == '__main__':
     # Robot constants.
-    scanner_displacement = 30.0
-    ticks_to_mm = 0.349
-    robot_width = 155.0
+    robot_data = {}
+    robot_data_file ="./robot.variable"
+    sql = open(robot_data_file,"r")
+        for l in sql:
+            data = l.split(":")
+            robot_data[data[0]]= data[1].strip()
+
+    scanner_displacement =float(robot_data['scanner_displacement'])
+    ticks_to_mm = float(robot_data['ticks_to_mm'])
+    robot_width = float(robot_data['robot_width'])
 
     # Cylinder extraction and matching constants.
-    minimum_valid_distance = 20.0
-    depth_jump = 100.0
-    cylinder_offset = 90.0
+    minimum_valid_distance = float(robot_data['minimum_valid_distance'])
+    depth_jump = float(robot_data['depth_jump'])
+    cylinder_offset = float(robot_data['cylinder_offset'])
 
     # Filter constants.
-    control_motion_factor = 0.35  # Error in motor control.
-    control_turn_factor = 0.6  # Additional error due to slip when turning.
-    measurement_distance_stddev = 200.0  # Distance measurement error of cylinders.
-    measurement_angle_stddev = 15.0 / 180.0 * pi  # Angle measurement error.
-    minimum_correspondence_likelihood = 0.001  # Min likelihood of correspondence.
+    control_motion_factor = float(robot_data['control_motion_factor'])  # Error in motor control.
+    control_turn_factor = float(robot_data['control_turn_factor'])  # Additional error due to slip when turning.
+    measurement_distance_stddev = float(robot_data['measurement_distance_stddev'])  # Distance measurement error of cylinders.
+    measurement_angle_stddev = float(robot_data['measurement_angle_stddev'])/ 180.0 * pi  # Angle measurement error.
+    minimum_correspondence_likelihood = float(robot_data['minimum_correspondence_likelihood'])  # Min likelihood of correspondence.
     #..............................perpomances variable
 
     time_start = 0;
@@ -435,12 +442,9 @@ if __name__ == '__main__':
     robot = Pyro4.Proxy("PYRONAME:example.robot")  # use name server object lookup uri shortcut
     con =connect()
     #############..............................
-
     # Generate initial particles. Each particle is (x, y, theta).
-
-
-    number_of_particles = 25
-    start_state = np.array([500.0, 0.0, 45.0 / 180.0 * pi])
+    number_of_particles = int (robot_data['number_of_particles'])
+    start_state = np.array(float(robot_data['start_x']), float(robot_data['start_y']), float(robot_data['start_angle']) / 180.0 * pi])
     initial_particles = [copy.copy(Particle(start_state))
                          for _ in xrange(number_of_particles)]
 
