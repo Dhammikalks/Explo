@@ -95,7 +95,7 @@ class Particle:
 
         H = self.dh_dlandmark(self.pose,self.landmark_positions[landmark_number],scanner_displacement)
         Q_l = np.dot(np.dot(H,self.landmark_covariances[landmark_number]),H.T)+Qt_measurement_covariance
-.
+
         return (H, Q_l)
 
     def wl_likelihood_of_correspondence(self, measurement,
@@ -160,7 +160,7 @@ class Particle:
         K = np.dot(self.landmark_covariances[landmark_number],np.dot(H.T,np.linalg.inv(Q_l)))
         self.landmark_positions[landmark_number]= self.landmark_positions[landmark_number] + np.dot(K,(measurement - self.h_expected_measurement_for_landmark(landmark_number,scanner_displacement)))
         self.landmark_covariances[landmark_number] = np.dot((np.eye(2) - np.dot(K,H)),self.landmark_covariances[landmark_number])
-.
+
 
     def update_particle(self, measurement, measurement_in_scanner_system,
                         number_of_landmarks,
