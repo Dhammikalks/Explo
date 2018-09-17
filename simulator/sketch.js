@@ -115,8 +115,8 @@ function keyTyped() {
     $.ajax({
               type: "POST",
               url: 'http:/localhost/simulator/data.php',
-                     data: { 'obstacle' :env,'robot postion' : robot_postion,
-                             'path' : path },
+                     data: { Obstacle :env,RobotPostion : robot_postion,
+                             Path : path },
                      success: function(data)
                      {
                       print("sucess!");
