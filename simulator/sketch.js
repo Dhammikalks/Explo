@@ -2,6 +2,7 @@ environment_extends = [700,700];
 scanner_range = 2200.0;
 var obstacle = [];
 var path = [];
+var env = [];
 var robot_postion = [0,0];
 colorValue = 0;
 var old_mX = 0;
@@ -10,6 +11,7 @@ var oldp_mX = 0;
 var oldp_mY = 0;
 var value = 0;
 var path_done = 0;
+var simulation = 0;
 function setup(){
     createCanvas(environment_extends[0], environment_extends[1]);
     background(0);
@@ -67,7 +69,7 @@ function keyTyped() {
 
     if( key == 'd'){
       var row = 0;
-      var env = [];
+
       loadPixels();
       for(var j = 0; j < 700 ; j++)
       {
@@ -90,15 +92,26 @@ function keyTyped() {
     updatePixels();
     print(env); // use the array
   }
-  if (key == 'r'){
+  if (key == 'r' && robot_postion[0]  ==  0  && robot_postion[1] == 0){
     fill('red');
        robot_postion = [mouseX,mouseY];
        ellipse(robot_postion[0],robot_postion[1],20,20);
   }
-  if(key == 'p'){
+  if(key == 'p' && path_done == 0){
     print(path);
     fill('rgb(0,255,0)');
     ellipse(oldp_mX,oldp_mY,20,20);
     path_done = 1;
+  }
+  if(key == 's' && path_done == 1 && simulation == 0 && (robot_postion[0]  !=  0 || robot_postion[1] != 0) )
+  {
+    print("obstacle==>\n");
+    print(env);
+    print("\n");
+    print("robot_postion==>\n");
+    print(robot_postion);
+    print("path==>\n");
+    print(path);
+    simulation = 1;
   }
 }
