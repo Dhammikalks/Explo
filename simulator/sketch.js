@@ -112,6 +112,17 @@ function keyTyped() {
     print(robot_postion);
     print("path==>\n");
     print(path);
+    $.ajax({
+              type: "POST",
+              url: 'http:/localhost/simulator/data.php',
+                     data: { 'obstacle' :env,'robot postion' : robot_postion,
+                             'path' : path },
+                     success: function(data)
+                     {
+                      print("sucess!");
+                     }
+
+    });
     simulation = 1;
   }
 }
