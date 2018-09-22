@@ -54,9 +54,6 @@ def toImage(vector):
     array_vector = np.asarray(vector)
     image = Image.fromarray(array_vector, 'L')
     return image
-##################################
-def getPixelSet(image,point1,point20):
-
 ################################## (python open cv does not implemeted this yet )from work of mohikhsan hat off to him
 def createLineIterator(P1, P2, img):
     """
@@ -130,4 +127,25 @@ def createLineIterator(P1, P2, img):
    itbuffer[:,2] = img[itbuffer[:,1].astype(np.uint),itbuffer[:,0].astype(np.uint)]
 
    return itbuffer
-  ######################################################
+ #####################################################
+ def calLastpixel(sensor_range,ange):
+     current_pose  = [sensor_range,sensor_range]
+     x = int(current_pose[0] - sensor_range*np.cos(np.deg2rad(angle)))
+     y = int(current_pose[1] - sensor_range*np.sin(np.deg2rad(angle)))
+     return (x,y)
+ ######################################################
+def calScanerRays(postion,sensor_range,canvas_range,env):
+    limit = calLimit(postion,sensor_range,canvas_range)
+    vector = getMetrix(limit,env);
+    img = toImage(vector);
+    ray_ends = []
+    for i in xrange(360):
+        end = calLastpixel(sensor_range,i):
+        pixelset = createLineIterator(postion, end, img):
+        ray_end = end
+        for i in xrange(length(pixelset)): # find if there is any obstacle inbetween
+            if(pixelset[2] == 255):
+                ray_end = [pixelset[0],pixelset[1]]
+                break
+        ray_ends.push(ray_end)
+#######################################################
