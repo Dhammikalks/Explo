@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import sys,json
+import sys,json,cv2
+from PIL import Image
 #getting the data set from the php
 sensor_range = 50;
 canvas_range = [700,700];
@@ -47,4 +48,8 @@ def getMetrix(limit,env):
             row.push(env[limit[1]+i][limit[0]+j])
         vector.push(row)
     return vector
+##################################
+def toImage(vector):
+    image = Image.fromarray(vector, 'L')
+    return image
 ##################################
