@@ -55,7 +55,7 @@ def toImage(vector):
     image = Image.fromarray(array_vector, 'L')
     return image
 ################################## (python open cv does not implemeted this yet )from work of mohikhsan hat off to him
-def createLineIterator(P1, P2, img):
+def createLineIterator(P1, P2, img,intensity):
     """
     Produces and array that consists of the coordinates and intensities of each pixel in a line between two points
 
@@ -67,9 +67,7 @@ def createLineIterator(P1, P2, img):
     Returns:
         -it: a numpy array that consists of the coordinates and intensities of each pixel in the radii (shape: [numPixels, 3], row = [x,y,intensity])
     """
-   #define local variables for readability
-   imageH = img.shape[0]
-   imageW = img.shape[1]
+
    P1X = P1[0]
    P1Y = P1[1]
    P2X = P2[0]
@@ -83,7 +81,13 @@ def createLineIterator(P1, P2, img):
    dYa = np.abs(dY)
 
    #predefine numpy array for output based on distance between points
-   itbuffer = np.empty(shape=(np.maximum(dYa,dXa),3),dtype=np.float32)
+   if(intensity == 1):
+       itbuffer = np.empty(shape=(np.maximum(dYa,dXa),3),dtype=np.float32)
+       #define local variables for readability
+       imageH = img.shape[0]
+       imageW = img.shape[1]
+   else:
+       itbuffer = np.empty(shape=(np.maximum(dYa,dXa),2),dtype=np.float32)
    itbuffer.fill(np.nan)
 
    #Obtain coordinates along the line using a form of Bresenham's algorithm
@@ -118,13 +122,13 @@ def createLineIterator(P1, P2, img):
                itbuffer[:,0] = np.arange(P1X+1,P1X+dXa+1)
            itbuffer[:,1] = (slope*(itbuffer[:,0]-P1X)).astype(np.int) + P1Y
 
-   #Remove points outside of image
-   colX = itbuffer[:,0]
-   colY = itbuffer[:,1]
-   itbuffer = itbuffer[(colX >= 0) & (colY >=0) & (colX<imageW) & (colY<imageH)]
-
-   #Get intensities from img ndarray
-   itbuffer[:,2] = img[itbuffer[:,1].astype(np.uint),itbuffer[:,0].astype(np.uint)]
+   if(intensity == 1 ):
+       #Remove points outside of image
+       colX = itbuffer[:,0]
+       colY = itbuffer[:,1]
+       itbuffer = itbuffer[(colX >= 0) & (colY >=0) & (colX<imageW) & (colY<imageH)]
+       #Get intensities from img ndarray
+       itbuffer[:,2] = img[itbuffer[:,1].astype(np.uint),itbuffer[:,0].astype(np.uint)]
 
    return itbuffer
  #####################################################
@@ -141,11 +145,27 @@ def calScanerRays(postion,sensor_range,canvas_range,env):
     ray_ends = []
     for i in xrange(360):
         end = calLastpixel(sensor_range,i):
-        pixelset = createLineIterator(postion, end, img):
+        pixelset = createLineIterator(postion, end, img,1):
         ray_end = end
-        for i in xrange(length(pixelset)): # find if there is any obstacle inbetween
+        for i in xrange(len(pixelset)): # find if there is any obstacle inbetween
             if(pixelset[2] == 255):
                 ray_end = [pixelset[0],pixelset[1]]
                 break
         ray_ends.push(ray_end)
+    return ray_ends
 #######################################################
+def distance(p1,p2):
+    [X1,Y1] = p1
+    [X2,Y2] = p2
+    d = math.sqrt((X1-X2)**2+(Y1-Y2)**2)
+    return d
+########################################################
+def getPath(path):
+    fullPath = []
+    image = 0;
+    for i in range(len(path)-1):
+        codinate = createLineIterator(path[i], path[i+1],i,0)
+        codinate.tolist().pop()
+        fullPath.extend(codinate.tolist())
+    return fullPath
+########################################################
