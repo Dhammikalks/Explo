@@ -12,6 +12,8 @@ var oldp_mY = 0;
 var value = 0;
 var path_done = 0;
 var simulation = 0;
+var save = 0;
+var env_builded = 0;
 function setup(){
     createCanvas(environment_extends[0], environment_extends[1]);
     background(0);
@@ -90,39 +92,54 @@ function keyTyped() {
             env.push(line)
           }
     updatePixels();
-    print(env); // use the array
+    env_builded = 1;
+    //print(env); // use the array
   }
-  if (key == 'r' && robot_postion[0]  ==  0  && robot_postion[1] == 0){
+  if (key == 'r' && env_builded == 1 && robot_postion[0]  ==  0  && robot_postion[1] == 0){
     fill('red');
        robot_postion = [mouseX,mouseY];
        ellipse(robot_postion[0],robot_postion[1],20,20);
   }
   if(key == 'p' && path_done == 0){
-    print(path);
+    //print(path);
     fill('rgb(0,255,0)');
     ellipse(oldp_mX,oldp_mY,20,20);
     path_done = 1;
   }
   if(key == 's' && path_done == 1 && simulation == 0 && (robot_postion[0]  !=  0 || robot_postion[1] != 0) )
   {
-    print("obstacle==>\n");
-    print(env);
-    print("\n");
-    print("robot_postion==>\n");
-    print(robot_postion);
-    print("path==>\n");
-    print(path);
+    //print("obstacle==>\n");
+    //print(env);
+    //print("\n");
+    //print("robot_postion==>\n");
+    //print(robot_postion);
+    //print("path==>\n");
+    //print(path);
+    var Data = {
+       "Obstacle" : env,
+       "RobotPostion": robot_postion,
+       "Path": path
+    };
+    alert(Data);
+    Data= JSON.stringify(Data);
+    alert(Data);
     $.ajax({
               type: "POST",
               url: 'http:/localhost/simulator/data.php',
-                     data: { Obstacle :env,RobotPostion : robot_postion,
-                             Path : path },
-                     success: function(data)
+              dataType: "json",
+              data: {ajaxcallid: '2', jsarr: Data},
+                     success: function(out)
                      {
                       print("sucess!");
+                      print(out);
                      }
 
     });
     simulation = 1;
+    save = 1
+  }
+  if(key == 'v' && simulation == 1)
+  {
+
   }
 }
