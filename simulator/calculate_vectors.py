@@ -2,23 +2,7 @@
 import sys,json,cv2
 from PIL import Image
 import numpy as np
-#getting the data set from the php
-sensor_range = 50;
-canvas_range = [700,700];
-env = [];
-initPos = [];
-path = [];
 
-####################################data from php
-try:
-   pos = json.loads( sys.argv[1]);
-   env = pos[0];
-   initPos = pos[1];
-   path  = pos[2];
-
-except:
-   print(sys.exc_info()))
-   sys.exit(1)
 ################################### build current vector range
 def calLimit(pos,sensor_range,canvas_range):
     Xminlimit = limit(pos[0],1,sensor_range,0)
@@ -143,11 +127,11 @@ def calScanerRays(postion,sensor_range,canvas_range,env):
     vector = getMetrix(limit,env);
     img = toImage(vector);
     ray_ends = []
-    for i in xrange(360):
+    for i in range(360):
         end = calLastpixel(sensor_range,i):
         pixelset = createLineIterator(postion, end, img,1):
         ray_end = end
-        for i in xrange(len(pixelset)): # find if there is any obstacle inbetween
+        for i in range(len(pixelset)): # find if there is any obstacle inbetween
             if(pixelset[2] == 255):
                 ray_end = [pixelset[0],pixelset[1]]
                 break
@@ -168,4 +152,34 @@ def getPath(path):
         codinate.tolist().pop()
         fullPath.extend(codinate.tolist())
     return fullPath
+########################################################
+def sensor(ray_ends,postion):
+    distances = []
+    for i in range(len(ray_ends)):
+        distances.append(distance(ray_ends[i],postion))
+    return distances
+########################################################
+if __name__ == '__main__':
+    #getting the data set from the php
+    sensor_range = 50;
+    canvas_range = [700,700];
+    env = [];
+    initPos = [];
+    path = [];
+
+##################data from php
+    try:
+        pos = json.loads( sys.argv[1]);
+        env = pos[0];
+        initPos = pos[1];
+        path  = pos[2];
+
+    except:
+        print(sys.exc_info()))
+        sys.exit(1)
+#######################
+    fullpath = getPath(path)
+    for i range(len(fullpath)):
+        rays = calScanerRays(fullpath[i],sensor_range,canvas_range,env)
+        distance_array = sensor(rays,fullpath[i])
 ########################################################
