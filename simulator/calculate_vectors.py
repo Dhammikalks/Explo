@@ -169,17 +169,18 @@ if __name__ == '__main__':
 
 ##################data from php
     try:
-        pos = json.loads( sys.argv[1]);
-        env = pos[0];
-        initPos = pos[1];
-        path  = pos[2];
+        pos = json.loads( sys.argv[0]);
+        print(pos);
+        #env = pos[0];
+        #initPos = pos[1];
+        #path  = pos[2];
 
     except:
         print(sys.exc_info()))
         sys.exit(1)
 #######################
-    fullpath = getPath(path)
-    for i range(len(fullpath)):
-        rays = calScanerRays(fullpath[i],sensor_range,canvas_range,env)
-        distance_array = sensor(rays,fullpath[i])
+#    fullpath = getPath(path)
+#    for i range(len(fullpath)):
+#        rays = calScanerRays(fullpath[i],sensor_range,canvas_range,env)
+#        distance_array = sensor(rays,fullpath[i])
 ########################################################
