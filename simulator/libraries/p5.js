@@ -5252,7 +5252,7 @@ exports.sizeOf = sizeOf;
 
     function timedOut() {
       self._timedOut = true
-      self.request.abort()      
+      self.request.abort()
     }
 
     function error(resp, msg, t) {
@@ -18391,10 +18391,19 @@ p5.prototype.saveFrames = function(fName, ext, _duration, _fps, callback) {
         p5.prototype.downloadFile(f.imageData, f.filename, f.ext);
       }
     }
-    frames = []; // clear frames
+    frames = []; // clear
   }, duration + 0.01);
 };
-
+//#########################################################costom
+p5.prototype.loadFrames = function(ext) {
+  var makeFrame = p5.prototype._makeFrame;
+  var cnv = this._curElement.elt;
+  var frame = makeFrame('frames', ext, cnv);
+  var f = frames;
+  frames = [];
+  return f;
+};
+//##########################################################
 p5.prototype._makeFrame = function(filename, extension, _cnv) {
   var cnv;
   if (this) {
