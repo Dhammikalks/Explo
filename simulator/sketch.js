@@ -12,10 +12,11 @@ var oldp_mY = 0;
 var value = 0;
 var path_done = 0;
 var simulation = 0;
-var save = 0;
+var Save_ = 0;
 var env_builded = 0;
+var env_data =  [];
 function setup(){
-    createCanvas(environment_extends[0], environment_extends[1]);
+  createCanvas(environment_extends[0], environment_extends[1]);
     background(0);
 }
 function draw()
@@ -35,12 +36,13 @@ if (mouseIsPressed == true ){
  else {  // drawpath
    if(!path_done){
    if(oldp_mX == 0 && oldp_mY == 0)
-{
+   {
    oldp_mX = robot_postion[0];
    oldp_mY = robot_postion[1];
-}
-   path[path.length] = [old_mX,old_mY];
-   if(mouseX != old_mX || mouseY != old_mY)
+   path[path.length] = [oldp_mX,oldp_mY];
+
+    }
+ if(mouseX != oldp_mX || mouseY != oldp_mY)
       {
         path[path.length] = [mouseX, mouseY]
         //line(mouseX, mouseY, pmouseX, pmouseY);
@@ -66,34 +68,11 @@ function keyTyped() {
 
     if ( key == 'n')
       {
-      obstacle = []
+      obstacle = [];
       }
-
     if( key == 'd'){
-      var row = 0;
-
-      loadPixels();
-      for(var j = 0; j < 700 ; j++)
-      {
-        var line = [];
-        var val = 0;
-        for (var i = j*700; i < (j+4)*700 ; i = i + 4)
-            {
-              var lum = .2126 * pixels[i] + .7152 * pixels[i+1] + .0722 * pixels[i+2];
-              if(lum > 253) {
-                        lum = 255;
-                            }
-              else {
-                  lum = 0;
-                   }
-              line[val] = lum;
-              val++;
-            }
-            env.push(line)
-          }
-    updatePixels();
-    env_builded = 1;
-    //print(env); // use the array
+      env = loadFrames('jpg'); // coustom p5.js lib
+      env_builded = 1;
   }
   if (key == 'r' && env_builded == 1 && robot_postion[0]  ==  0  && robot_postion[1] == 0){
     fill('red');
@@ -108,26 +87,20 @@ function keyTyped() {
   }
   if(key == 's' && path_done == 1 && simulation == 0 && (robot_postion[0]  !=  0 || robot_postion[1] != 0) )
   {
-    //print("obstacle==>\n");
-    //print(env);
-    //print("\n");
-    //print("robot_postion==>\n");
-    //print(robot_postion);
-    //print("path==>\n");
-    //print(path);
     var Data = {
-       "Obstacle" : env,
+       "Obstacle" : env[0],
        "RobotPostion": robot_postion,
        "Path": path
     };
+
     alert(Data);
-    Data= JSON.stringify(Data);
-    alert(Data);
+    Data_json= JSON.stringify(Data);
+
     $.ajax({
               type: "POST",
               url: 'http:/localhost/simulator/data.php',
               dataType: "json",
-              data: {ajaxcallid: '2', jsarr: Data},
+              data: {ajaxcallid: '2', jsarr: Data_json},
                      success: function(out)
                      {
                       print("sucess!");
@@ -136,7 +109,7 @@ function keyTyped() {
 
     });
     simulation = 1;
-    save = 1
+    Save_ = 1
   }
   if(key == 'v' && simulation == 1)
   {
