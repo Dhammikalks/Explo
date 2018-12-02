@@ -13,3 +13,6 @@ number_of_particles:25
 start_x:500.0
 start_y:0.0
 start_angle:45.0
+sensor_range:2200.0
+canvas_range:[600,600]
+operating_angle:360

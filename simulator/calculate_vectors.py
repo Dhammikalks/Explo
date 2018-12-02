@@ -128,9 +128,9 @@ def calLastpixel(postion,sensor_range,canvas_range,angle):
         y = canvas_range[1]
     return (x,y)
  ######################################################
-def calScanerRays(postion,sensor_range,canvas_range,env,sensor_stdv):
+def calScanerRays(postion,sensor_range,canvas_range,env,sensor_stdv,sensor_op_angle):
     ray_ends = []
-    for i in range(360):
+    for i in range(sensor_op_angle):
         end = calLastpixel(postion,sensor_range,canvas_range,i)
         end = (end[0],end[1])
         pixelset = createLineIterator(postion, end, env,1)
@@ -168,7 +168,7 @@ def get_vector(path,angle):
         else:
             x = path[i][0]
             y = path[i][1]
-            theta = math.atan2((path[i][1]-path[i-1][1]),(path[i][0]-path[i-1][0]))
+            theta = math.atan2((path[i][1]-path[i-1][1]),(path[i][0]-path[i-1 ][0]))
         pos_vectors.append([x,y,theta])
     return pos_vectors
 ########################################################
@@ -179,16 +179,12 @@ def sensor(ray_ends,postion):
     return distances
 #######################################################
 class robot:
-    def __init__(self,robotWidth,robotLenght,wheelRadius,encoderticks):
+    def __init__(self,robotWidth,encoderticks_for_mm):
         self.width = robotWidth;
-        self.lenght = robotLenght;
-        self.wheel_radius = wheelRadius;
-        self.tickcount = encoderticks;
         self.count_left = 0
         self.count_right = 0
         self.postion = [0,0,0];
-        self.wheellength = math.pi*2*self.wheel_radius
-        self.ticks_per_lenth = self.tickcount/self.wheellength
+        self.ticks_to_mm = encoderticks_for_mm
 
     def init_pos(self,pos):
         self.postion = pos
@@ -197,7 +193,7 @@ class robot:
         [x,y,theta] = self.postion
         [xn,yn,thetan] = next_pos
         if(theta == thetan):
-            count = abs((xn-x)/np.cos(theta))*self.ticks_per_lenth
+            count = abs((xn-x)/np.cos(theta))*(1/self.ticks_to_mm)
             self.count_left += int(count)
             self.count_right += int(count)
         else:
@@ -205,8 +201,8 @@ class robot:
             rad = ((xn -x)/(np.sin(thetan) - np.sin(theta)))-(self.width/2.)
             l = rad*alpha
             r = self.width*alpha + l
-            self.count_left += int(abs(l))
-            self.count_right += int(abs(r))
+            self.count_left += int(abs(l*(1/self.ticks_to_mm)))
+            self.count_right += int(abs(r*(1/self.ticks_to_mm)))
         self.postion = next_pos
 
     def tickcount_left(self):
@@ -217,9 +213,21 @@ class robot:
 ########################################################
 if __name__ == '__main__':
     #getting the data set from the php
-    sensor_range = 50;
-    sensor_stdv = 0.5;
-    canvas_range = [700,700];
+    # Robot constants.
+    robot_data = {}
+    robot_data_file ="./robot.variable"
+    sql = open(robot_data_file,"r")
+    for l in sql:
+        data = l.split(":")
+        robot_data[data[0]]= data[1].strip()
+
+    sensor_range = float(robot_data['sensor_range'])
+    sensor_stdv = float(robot_data['measurement_distance_stddev']);
+    canvas_range = [int(robot_data['canvas_range'][0]),int(robot_data['canvas_range'][1])];
+    robotWidth = float(robot_data['robot_width']);
+    encoderticks_for_mm = float(robot_data['ticks_for_mm']);
+    operation_angle = int(robot_data['operating_angle'])
+
     env = [];
     initPos = [];
     path = [];
@@ -238,13 +246,20 @@ if __name__ == '__main__':
         fullpath = getPath(path)
         pos_vectors = get_vector(fullpath,0.0)
         distance_array = [];
-    bot = robot(10,15,5,100);
+    bot = robot(robotWidth,encoderticks_for_mm);
     bot.init_pos(pos_vectors[0])
     tick_counts = []
+    "example encoder data : M 204 20795 20795 3000 0 16067 16066 3000 0 0 0 6000 0"
+    encoder_data = file("motor_encoder.txt",'w')
+    scanner_data = file("robot_scanner.txt",'w')
     for i in range(len(pos_vectors)):
         bot.run(pos_vectors[i])
         tick_counts.append([bot.tickcount_left(),bot.tickcount_right()])
-        rays = calScanerRays(fullpath[i],sensor_range,canvas_range,image,sensor_stdv)
+        encoder_data.write("M 204 "+str(bot.tickcount_left())+" 20795 3000 0 "+str(bot.tickcount_right())+" 16066 3000 0 0 0 6000 0\n")
+        rays = calScanerRays(fullpath[i],sensor_range,canvas_range,image,sensor_stdv,operation_angle)
+        scanner_data.write("S "+' '.join([str(x) for x in rays])+"\n")
         sensor_rays.append(rays);
-    print(tick_counts)
+    scanner_data.close()
+    encoder_data.close()
+    print("done")
     ########################################################
