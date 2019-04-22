@@ -12,11 +12,11 @@ import numpy as np
 import datetime
 import Pyro4
 import sys,time
-import MySQLdb
 import json
 import array
 import pymongo
 from multiprocessing import Pipe , Process
+from pymongo import MongoClient
 #..................................................................................
 class Particle:
     def __init__(self, pose):
@@ -329,26 +329,32 @@ class FastSLAM:
         return self.motor_ticks
 #......................................................................
 
-def connect():
-    sql_data = {}
-    sql_data_file ="./sql.data"
-    sql = open(sql_data_file,"r")
-    for l in sql:
-        data = l.split(":")
-        sql_data[data[0]]= data[1].strip()
-    con = MySQLdb.connect(host=sql_data["host"], user=sql_data["user"], passwd=sql_data["passwd"], db=sql_data["db"])
-    try:
+def connect(isSql):
+    if isSql:
+        sql_data = {}
+        sql_data_file ="./sql.data"
+        sql = open(sql_data_file,"r")
+        for l in sql:
+            data = l.split(":")
+            sql_data[data[0]]= data[1].strip()
+        con = MySQLdb.connect(host=sql_data["host"], user=sql_data["user"], passwd=sql_data["passwd"], db=sql_data["db"])
+        try:
 
-        cur = con.cursor()
-        #query = "INSERT INTO SLAM(Time_stamp_big ,Scan_data ,Partical_pos ,Errors , Cylinders ,Error_elipses ,Time_Stamp_end ,Opration_time) values(\"gjfig\",\"fhgh\",\"gfdhg\",\"dhdh\",\"hhg\",\"fghfh\",\"dgdg\",2)"
-        #cur.execute(query)
-        con.commit()
-        # data = cur.fetchall()e
-    except MySQLdb.Error, e:
-        print(e)
-        if con:
-            con.rollback()
-    return con
+            cur = con.cursor()
+            #query = "INSERT INTO SLAM(Time_stamp_big ,Scan_data ,Partical_pos ,Errors , Cylinders ,Error_elipses ,Time_Stamp_end ,Opration_time) values(\"gjfig\",\"fhgh\",\"gfdhg\",\"dhdh\",\"hhg\",\"fghfh\",\"dgdg\",2)"
+            #cur.execute(query)
+            con.commit()
+            # data = cur.fetchall()e
+        except MySQLdb.Error, e:
+            print(e)
+            if con:
+                con.rollback()
+        return con
+    else:
+        client = MongoClient()
+        client = MongoClient("localhost", 27020)
+        db = client['robotDB']
+        return db
 #........................................................................
 def SQL_CMD(con,query):
     cur = con.cursor()
@@ -370,7 +376,6 @@ def insert_Data_to_DataBase(conn):
     SQL_CMD(con,query_3)
     #print data
     #return 0
-#........................................................
 #......................................................................
 if __name__ == '__main__':
     # Robot constants.
