@@ -14,6 +14,7 @@ import Pyro4
 import sys,time
 import MySQLdb
 import json
+import pymongo
 import array
 from multiprocessing import Pipe , Process
 #..................................................................................
@@ -232,6 +233,7 @@ class Particle:
 
 #.................................................................................
 class FastSLAM:
+
 
     def __init__(self, initial_particles,
                  robot_width, scanner_displacement,
