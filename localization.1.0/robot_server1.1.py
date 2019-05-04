@@ -367,15 +367,31 @@ def insert_Data_to_DataBase(conn):
     con  = connect()
     data = conn.recv()
     #........................
-    #........................
-    query_1 = "INSERT INTO SLAM(Scan_data , position, Partical_pos ,Errors , Cylinders ,Error_elipses) values('"+data[1]+"' ,'"+data[2]+"','"+data[3]+"','"+data[4]+"','"+data[5]+"','"+data[6]+"')"
-    query_2 = "INSERT INTO performance(Time_Stamp_begining ,Time_Stamp_end ,Opration_time) values('"+data[0]+"','"+data[7]+"','"+data[8]+"')"
-    query_3 = "INSERT INTO Data_ref(is_New ) values('"+str(1)+"')"
-    SQL_CMD(con, query_1)
-    SQL_CMD(con,query_2)
-    SQL_CMD(con,query_3)
-    #print data
-    #return 0
+    if data[0]:
+        #........................
+        query_1 = "INSERT INTO SLAM(Scan_data , position, Partical_pos ,Errors , Cylinders ,Error_elipses) values('"+data[2]+"' ,'"+data[3]+"','"+data[4]+"','"+data[5]+"','"+data[6]+"','"+data[7]+"')"
+        query_2 = "INSERT INTO performance(Time_Stamp_begining ,Time_Stamp_end ,Opration_time) values('"+data[1]+"','"+data[8]+"','"+data[9]+"')"
+        query_3 = "INSERT INTO Data_ref(is_New ) values('"+str(1)+"')"
+        SQL_CMD(con, query_1)
+        SQL_CMD(con,query_2)
+        SQL_CMD(con,query_3)
+        #print data
+        #return 0
+    else:
+        article_slam = {"Scan_data": data[2],
+                   "position": data[3],
+                   "Partical_pos": data[4],
+                   "Errors": data[5],
+                   "Cylinders": data[6] ,
+                   "Error_elipses": data[7] }
+        articles = db.article_slam
+        result = articles.insert_one(articles)
+        
+        article_performance = { "Time_Stamp_begining": data[1],
+                                "Time_Stamp_end": date[8],
+                                "Opration_time": data[9] }
+        article_dataref = {"slam_index":,
+                           "is_New": 1 }
 #......................................................................
 if __name__ == '__main__':
     # Robot constants.
@@ -526,7 +542,7 @@ if __name__ == '__main__':
                 landmark_pos = [np.asarray(i).tolist() for i in fs.particles[output_particle].landmark_positions]
                 #landmark_cov = [np.asarray(i).tolist() for i in fs.particles[output_particle].landmark_covariances]
                 #print landmark_pos
-                data =[str(time_start),str(scan_data),str(np.asarray(mean).tolist()),str(posed) ,str(
+                data =[isSql,str(time_start),str(scan_data),str(np.asarray(mean).tolist()),str(posed) ,str(
                     errors) ,str(landmark_pos),str(error_eclipse),str(time_finish), str(
                     process_time.microseconds / 1E6)]
                 #.................................
