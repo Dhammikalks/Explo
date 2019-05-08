@@ -378,20 +378,28 @@ def insert_Data_to_DataBase(conn):
         #print data
         #return 0
     else:
-        article_slam = {"Scan_data": data[2],
+        article = {"Scan_data": data[2],
                    "position": data[3],
                    "Partical_pos": data[4],
                    "Errors": data[5],
                    "Cylinders": data[6] ,
                    "Error_elipses": data[7] }
-        articles = db.article_slam
-        result = articles.insert_one(articles)
-        
-        article_performance = { "Time_Stamp_begining": data[1],
+        articles = db.articles
+        result = articles.insert_one(article)
+
+        article_performance = { "slam_index": result.insert_id,
+                                "Time_Stamp_begining": data[1],
                                 "Time_Stamp_end": date[8],
                                 "Opration_time": data[9] }
-        article_dataref = {"slam_index":,
+
+        article_dataref = {"slam_index": result.inserted_id,
                            "is_New": 1 }
+                           
+        perfromance = db.performance
+        data_ref = db.Data_ref
+        result1 = perfromance.insert_one(article_performance)
+        result2 = data_ref.insert_one(article_dataref)
+
 #......................................................................
 if __name__ == '__main__':
     # Robot constants.
