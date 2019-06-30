@@ -32,7 +32,7 @@ def detect_ruptures_breakouts(scan_data, bound_angle,sensor_angular_resolution,m
             rupture_points[n] = True;
         else:
             if current_scan_point == breakout_point_index:
-                print(scan_data[n])
+                #print(scan_data[n])
                 current_obstacle_pose = init_obstacle_pose(scan_data[n])
                 current_coveriance = init_coveriance(bound_angle,scan_data[n],sensor_angular_resolution)
             else:
@@ -63,14 +63,11 @@ def get_lines(scan_data,breakout_points,rupture_points, line_down_limit,robot_po
             break
         while breakout_points[current_point] == False and rupture_points[current_point] == False:
             current_point += 1
-            print("current point"),
-            print(current_point)
             if current_point >= len(scan_data):
                 break
         break_point = current_point
         if (current_point - start_point +1 ) > line_down_limit:
-            print("got_line to process")
-            print(scan_data[start_point:current_point])
+            #print(scan_data[start_point:current_point])
             line = extract_line(scan_data[start_point:current_point],start_point,robot_pose)
             lines.append(line)
     return lines
@@ -118,12 +115,11 @@ if __name__ == '__main__':
     sensor_angular_resolution = pi*(360/1081)/180
     model_noise_variance = 0.1
     measurement_noise_variance = 0.05
-    scanner_max_range = 5.0
+    scanner_max_range = 30.0
     [breakout_points, rupture_points] = detect_ruptures_breakouts(scans,bound_angle,sensor_angular_resolution,model_noise_variance,measurement_noise_variance,scanner_max_range)
     print("breakout_points -->   "),
-    print(len(breakout_points))
+    print(breakout_points)
     print("rupture_points -->    "),
-    print(len(rupture_points))
-    print(len(scans))
-    lines = get_lines(scans,breakout_points,rupture_points, 4,[1,4,0.1])
+    print(rupture_points)
+    lines = get_lines(scans,breakout_points,rupture_points, 4,[6.19999990761,7.14285708964,0.0])
     print(lines)
