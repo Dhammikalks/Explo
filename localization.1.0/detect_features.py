@@ -59,17 +59,22 @@ def get_lines(scan_data,breakout_points,rupture_points, line_down_limit,robot_po
     while current_point < range(len(scan_data)):
         start_point =  break_point
         current_point = start_point + 1
-        print(current_point)
-        while breakout_points[current_point] == False & rupture_points[current_point] == False:
+        if current_point >= len(scan_data):
+            break
+        while breakout_points[current_point] == False and rupture_points[current_point] == False:
             current_point += 1
-            if current_point == len(scan_data):
+            print("current point"),
+            print(current_point)
+            if current_point >= len(scan_data):
                 break
         break_point = current_point
         if (current_point - start_point +1 ) > line_down_limit:
             print("got_line to process")
-            #print(scan_data[start_point:current_point])
-            #line = extract_line(scan_data[start_point:current_point],start_point,robot_pose)
-            #ines.append(line)
+            print(scan_data[start_point:current_point])
+            line = extract_line(scan_data[start_point:current_point],start_point,robot_pose)
+            lines.append(line)
+    return lines
+
 
 def get_scan_point_codinate(robot_pose,point_polor):
     return [robot_pose[0] + float(point_polor[0])*float(cos(robot_pose[2] + point_polor[1])),robot_pose[1] + float(point_polor[0])*float(sin(robot_pose[2] + point_polor[1]))]
@@ -112,10 +117,13 @@ if __name__ == '__main__':
     bound_angle = pi*10/180
     sensor_angular_resolution = pi*(360/1081)/180
     model_noise_variance = 0.1
-    measurement_noise_variance = 0.03
+    measurement_noise_variance = 0.05
     scanner_max_range = 5.0
     [breakout_points, rupture_points] = detect_ruptures_breakouts(scans,bound_angle,sensor_angular_resolution,model_noise_variance,measurement_noise_variance,scanner_max_range)
-    print(breakout_points)
-    print(rupture_points)
+    print("breakout_points -->   "),
+    print(len(breakout_points))
+    print("rupture_points -->    "),
+    print(len(rupture_points))
+    print(len(scans))
     lines = get_lines(scans,breakout_points,rupture_points, 4,[1,4,0.1])
     print(lines)
