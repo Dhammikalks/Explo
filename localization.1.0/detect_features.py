@@ -78,9 +78,11 @@ def get_scan_point_codinate(robot_pose,point_polor):
 
 def extract_line(point_segment,start_index,robot_pose):
     [x,y,alpha] = whight_pose(point_segment,start_index,robot_pose)
+    #p = "weighted position ->> x = %s,y, = %s alpha = %s " % (x,y,alpha)
+    #print(p)
     [Sxx,Syy,Sxy] = point_veriations([x,y],point_segment,start_index,robot_pose)
     rq = x*cos(alpha) + y*sin(alpha)
-    alpha = (1/2)*atan2( -2*Sxy,(Syy - Sxx))
+    alpha = (1/2)*atan2(-2*Sxy,(Syy - Sxx))
     return [rq, alpha]
 
 def point_veriations( whighted_coordinate, point_segment,start_index, robot_pose):
@@ -92,8 +94,11 @@ def point_veriations( whighted_coordinate, point_segment,start_index, robot_pose
 
 def whight_pose(point_segment,index,robot_pose):
     obs_pose = [0 , 0]
+    num_points = 0
     for i in range(len(point_segment)):
+        num_points += 1
         obs_pose = np.add(obs_pose , get_scan_point_codinate(robot_pose,[point_segment[i],sensor_start_angle-index*sensor_angular_resolution]))
+    obs_pose = [obs_pose[0]/num_points,obs_pose[1]/num_points]
     beta = atan2(obs_pose[1],obs_pose[0])
     return [obs_pose[0],obs_pose[1],beta]
 
@@ -118,8 +123,8 @@ if __name__ == '__main__':
     scanner_max_range = 30.0
     [breakout_points, rupture_points] = detect_ruptures_breakouts(scans,bound_angle,sensor_angular_resolution,model_noise_variance,measurement_noise_variance,scanner_max_range)
     print("breakout_points -->   "),
-    print(breakout_points)
+    print(len(breakout_points))
     print("rupture_points -->    "),
-    print(rupture_points)
+    print(len(rupture_points))
     lines = get_lines(scans,breakout_points,rupture_points, 4,[6.19999990761,7.14285708964,0.0])
     print(lines)
