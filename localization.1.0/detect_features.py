@@ -52,7 +52,7 @@ def detect_ruptures_breakouts(scan_data, bound_angle,sensor_angular_resolution,m
             current_scan_point += 1
     return [breakout_points,rupture_points]
 
-def get_lines(scan_data,breakout_points,rupture_points, line_down_limit,robot_pose):
+def get_lines(scan_data,breakout_points,rupture_points, line_down_limit,robot_pose,sensor_start_angle,sensor_angular_resolution):
     lines = []
     break_point = 0
     current_point  = 0
@@ -68,7 +68,7 @@ def get_lines(scan_data,breakout_points,rupture_points, line_down_limit,robot_po
         break_point = current_point
         if (current_point - start_point +1 ) > line_down_limit:
             #print(scan_data[start_point:current_point])
-            line = extract_line(scan_data[start_point:current_point],start_point,robot_pose)
+            line = extract_line(scan_data[start_point:current_point],start_point,robot_pose,sensor_start_angle,sensor_angular_resolution)
             lines.append(line)
     return lines
 
@@ -76,28 +76,38 @@ def get_lines(scan_data,breakout_points,rupture_points, line_down_limit,robot_po
 def get_scan_point_codinate(robot_pose,point_polor):
     return [robot_pose[0] + float(point_polor[0])*float(cos(robot_pose[2] + point_polor[1])),robot_pose[1] + float(point_polor[0])*float(sin(robot_pose[2] + point_polor[1]))]
 
-def extract_line(point_segment,start_index,robot_pose):
-    [x,y,alpha] = whight_pose(point_segment,start_index,robot_pose)
-    #p = "weighted position ->> x = %s,y, = %s alpha = %s " % (x,y,alpha)
-    #print(p)
-    [Sxx,Syy,Sxy] = point_veriations([x,y],point_segment,start_index,robot_pose)
+def extract_line(point_segment,start_index,robot_pose,sensor_start_angle,sensor_angular_resolution):
+    [x,y,alpha] = whight_pose(point_segment,start_index,robot_pose,sensor_start_angle,sensor_angular_resolution)
+    p = "weighted position ->> x = %s,y, = %s alpha = %s " % (x,y,alpha)
+    print(p)
+    [Sxx,Syy,Sxy] = point_veriations([x,y],point_segment,start_index,robot_pose,sensor_start_angle,sensor_angular_resolution)
+    p2 = "sxx = %s, syy = %s ,Sxy = %s" % (Sxx,Syy,Sxy)
+    print(p2)
     rq = x*cos(alpha) + y*sin(alpha)
-    alpha = (1/2)*atan2(-2*Sxy,(Syy - Sxx))
-    return [rq, alpha]
+    alpha1 = atan2(2*Sxy,(Syy-Sxx))/2
+    if Syy < Sxx:
+        alpha1 = alpha1
+    else:
+        alpha1 = -alpha1
+    return [rq, alpha1]
 
-def point_veriations( whighted_coordinate, point_segment,start_index, robot_pose):
+def point_veriations( whighted_coordinate, point_segment,start_index, robot_pose,sensor_start_angle,sensor_angular_resolution):
     [Sxx,Syy,Sxy] = [0,0,0]
     for i in range(len(point_segment)):
-        [Sxx,Syy,Sxy] = [Sxx+(get_scan_point_codinate(robot_pose,[point_segment[i],sensor_start_angle-(start_index + i )*sensor_angular_resolution])[0] -whighted_coordinate[0])**2, Syy + (get_scan_point_codinate(robot_pose,[point_segment[i],sensor_start_angle-(start_index + i)*sensor_angular_resolution])[1]-whighted_coordinate[1])**2 \
-            ,Sxy + ( get_scan_point_codinate(robot_pose,[point_segment[i],sensor_start_angle-(start_index +i)*sensor_angular_resolution])[0] -whighted_coordinate[0])*(get_scan_point_codinate(robot_pose,[point_segment[i],sensor_start_angle-(start_index + i)*sensor_angular_resolution])[1]-whighted_coordinate[1])]
+        angle = sensor_start_angle-(start_index +i)*sensor_angular_resolution
+        pose = get_scan_point_codinate(robot_pose,[point_segment[i],angle])
+        [Sxx,Syy,Sxy] = [Sxx+(pose[0] - whighted_coordinate[0])**2, Syy + (pose[1]-whighted_coordinate[1])**2 \
+            ,Sxy + (pose[0] - whighted_coordinate[0])*(pose[1]- whighted_coordinate[1])]
     return [Sxx,Syy,Sxy]
 
-def whight_pose(point_segment,index,robot_pose):
+def whight_pose(point_segment,index,robot_pose,sensor_start_angle,sensor_angular_resolution):
     obs_pose = [0 , 0]
     num_points = 0
     for i in range(len(point_segment)):
         num_points += 1
-        obs_pose = np.add(obs_pose , get_scan_point_codinate(robot_pose,[point_segment[i],sensor_start_angle-index*sensor_angular_resolution]))
+        angle = sensor_start_angle-(index+i)*sensor_angular_resolution
+        pose = get_scan_point_codinate(robot_pose,[point_segment[i],angle])
+        obs_pose = np.add(obs_pose , angle )
     obs_pose = [obs_pose[0]/num_points,obs_pose[1]/num_points]
     beta = atan2(obs_pose[1],obs_pose[0])
     return [obs_pose[0],obs_pose[1],beta]
@@ -107,7 +117,7 @@ def line_coveriance(scan_variance,line_pose):
     return (scan_variance)**2*np.array([[cos(alpha)**2, cos(alpha)*sin(alpha)],[cos(alpha)*sin(alpha), sin(alpha)**2]])
 
 if __name__ == '__main__':
-    sensor_start_angle = 135.25
+    sensor_start_angle = 2.36055781 #inradiant angle
     scan_data ="./scan_data"
     scan = open(scan_data,"r")
     scans_data = (scan.read()).split(",")
@@ -117,8 +127,8 @@ if __name__ == '__main__':
 	scans.append(float(scans_data[l]))
 
     bound_angle = pi*10/180
-    sensor_angular_resolution = pi*(360/1081)/180
-    model_noise_variance = 0.1
+    sensor_angular_resolution = pi*(270.64/1081)/180
+    model_noise_variance = 0.015
     measurement_noise_variance = 0.05
     scanner_max_range = 30.0
     [breakout_points, rupture_points] = detect_ruptures_breakouts(scans,bound_angle,sensor_angular_resolution,model_noise_variance,measurement_noise_variance,scanner_max_range)
@@ -126,5 +136,5 @@ if __name__ == '__main__':
     print(len(breakout_points))
     print("rupture_points -->    "),
     print(len(rupture_points))
-    lines = get_lines(scans,breakout_points,rupture_points, 4,[6.19999990761,7.14285708964,0.0])
+    lines = get_lines(scans,breakout_points,rupture_points, 4,[6.19999990761,7.14285708964,0.0],sensor_start_angle,sensor_angular_resolution)
     print(lines)
