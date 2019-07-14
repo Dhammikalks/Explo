@@ -111,9 +111,11 @@ def whight_pose(point_segment,index,robot_pose,sensor_start_angle,sensor_angular
     obs_pose = [obs_pose[0]/num_points,obs_pose[1]/num_points]
     beta = atan2(obs_pose[1],obs_pose[0])
     return [obs_pose[0],obs_pose[1],beta]
-
+#...................assuming  variance is  close to Cdpn
+Cdpn =
+#.........................
 def line_coveriance(scan_variance,line_pose):
-    alpha = atan2(y,x)
+    alpha = line_pose[1]
     return (scan_variance)**2*np.array([[cos(alpha)**2, cos(alpha)*sin(alpha)],[cos(alpha)*sin(alpha), sin(alpha)**2]])
 
 if __name__ == '__main__':
